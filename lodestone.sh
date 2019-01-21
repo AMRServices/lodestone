@@ -231,7 +231,7 @@ rm ${OUTDIR}/${CAVID}.concatenated_reads.fq.gz
 mash dist -p 20 ${OUTDIR}/${CAVID}.fq.msh ${OUTDIR}/${CAVID}.fa.msh > ${OUTDIR}/logs/7_mash_report/${CAVID}.mash-dist_output.tsv
 closest_mash_hit=$(basename $(sort -g -k3 ${OUTDIR}/logs/7_mash_report/${CAVID}.mash-dist_output.tsv | head -1 | cut -f2))
 closest_mash_hit_root=${closest_mash_hit%_genomic.fna.gz}
-path_to_closest_mash_hit=$(grep $closest_mash_hit_root ${OUTDIR}/assembly_summary.txt | head -1 | awk '{print $(NF)}')
+path_to_closest_mash_hit=$(grep $closest_mash_hit_root ${OUTDIR}/assembly_summary.txt | head -1 | awk '{print $20}')
 FTPPATHG=$path_to_closest_mash_hit/$closest_mash_hit_root'_genomic.fna.gz'
 FTPPATHGFF=$path_to_closest_mash_hit/$closest_mash_hit_root'_genomic.gff.gz'
 wget $FTPPATHG -O ${OUTDIR}/ref.fa.gz &>> ${LOGFILE}
