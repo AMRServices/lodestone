@@ -12,8 +12,8 @@ This script is the SP3 pipeline implementation
 as shared by Stephen Bush
 
 Author: Hardik Parikh
-Last Modified: 11/02/2018
-Version: 0.1
+Last Modified: 01/20/2019
+Version: 0.2
 
 OPTIONS:
         -h      Show this message
