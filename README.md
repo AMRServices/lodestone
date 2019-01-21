@@ -41,7 +41,7 @@ Workflow Steps:
 This script performs QC, followed by reference identification using kaiju/mash. The reference genome is downloaded from NCBI, followed by variant calling. The pipeline will also perform de-novo assembly using spades. 
  
 ```
-sh lodestone.sh [options]
+[~]$ sh lodestone.sh [options]
 
 OPTIONS:
         -h      Show this message
@@ -49,6 +49,10 @@ OPTIONS:
         -1      FULL/PATH/TO/ForwardRawReads (*_R1.fq.gz)
         -2      FULL/PATH/TO/ReverseRawReads (*_R2.fq.gz)
         -o      FULL/PATH/TO/OutDir
+
+## Example command 
+[~]$ sh lodestone.sh -c CAV001 -1 CAV001_R1.fq.gz -2 CAV002_R2.fq.gz -o CAV001_lodestone
+
 ```
 
 ### lodestone_w_ref.sh
@@ -57,7 +61,7 @@ Use this script if you wish to call variants against a known reference genome.
 This script performs QC, followed by variant calling. The pipeline will also perform de-novo assembly using spades. 
 
 ```
-sh lodestone_w_ref.sh [options]
+[~]$ sh lodestone_w_ref.sh [options]
 
 OPTIONS:
         -h      Show this message
@@ -66,13 +70,17 @@ OPTIONS:
         -2      FULL/PATH/TO/ReverseRawReads (*_R2.fq.gz)
         -r      FULL/PATH/TO/ref.fa (Reference genome FASTA)
         -o      FULL/PATH/TO/OutDir
+
+## Example command 
+[~]$ sh lodestone_w_ref.sh -c CAV001 -1 CAV001_R1.fq.gz -2 CAV002_R2.fq.gz -r ref.fa -o CAV001_lodestone
+
 ```
 
 ### SLURM submission scripts
 
-Example SLURM job submission scripts are included - 
-	-	`submit-lodestone.slurm.sh` : job submission for single isolate data
-	-	`submit-lodestone.slurm-array.sh`	: batch submission for multiple isolates using slurm array
+Example SLURM job submission scripts are included  
+	- `submit-lodestone.slurm.sh` : job submission for single isolate data
+	- `submit-lodestone.slurm-array.sh`	: batch submission for multiple isolates using slurm array
 
 
 
