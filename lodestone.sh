@@ -156,7 +156,7 @@ top_genus_pe_hit=$(awk -F '\t' 'NR==3 {print $3}' ${OUTDIR}/logs/5_kaiju_report/
 top_sp_pe_hit=$(awk -F '\t' 'NR==3 {print $3}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.pe.txt)
 top_sp_se_hit=$(awk -F '\t' 'NR==3 {print $3}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.se.txt)
 if [[ "$top_sp_pe_hit" != "$top_sp_se_hit" ]]; then 
-	echo -e "\n-->$current_date_time.WARNING: candidate species for ${CAVID} as predicted from PE and SE reads DO NOT match; proceeding with paired-end hit ...\n" >> ${LOGFILE}
+	echo -e "\n-->$current_date_time. WARNING: candidate species for ${CAVID} as predicted from PE and SE reads DO NOT match; proceeding with paired-end hit ...\n" >> ${LOGFILE}
 else
 	echo -e "\n-->$current_date_time. candidate species for ${CAVID} as predicted from PE and SE reads MATCH!\n" >> ${LOGFILE}
 fi
@@ -167,13 +167,12 @@ fi
 tax_level_to_dwl="species"
 top_sp_pe_hit=$(awk -F '\t' 'NR==3 {print $3}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.pe.txt)
 top_sp_reads=$(awk -F '\t' 'NR==3 {print $1}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.pe.txt)
-top_hit_genus=`echo $top_sp_se_hit | awk '{print $1}'`
+top_hit_genus=`echo $top_sp_pe_hit | awk '{print $1}'`
 sec_sp_pe_hit=$(awk -F '\t' 'NR==4 {print $3}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.pe.txt)
 sec_hit_genus=`echo $sec_sp_pe_hit | awk '{print $1}'`
 if ([[ "$top_hit_genus" == "$sec_hit_genus" ]] && [[ "$top_sp_reads" < 50.0 ]]); then
 	tax_level_to_dwl="genus"
 fi
-
 
 ## Get TaxID for top hit
 SPECIES_TAXID=$(esearch -db taxonomy -query "$top_sp_pe_hit" | efetch -format docsum | xtract -pattern DocumentSummary -element TaxId)
@@ -193,13 +192,15 @@ if [[ "$tax_level_to_dwl" == "species" ]]; then
 		awk -F '\t' -v genus=${top_genus_pe_hit} '$8 ~ genus' ${OUTDIR}/assembly_summary.txt | awk -F '\t' '$12=="Complete Genome" && $11=="latest" {print $20}' > ${OUTDIR}/ftpdirpaths.txt
 		awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print ftpdir,file}' ${OUTDIR}/ftpdirpaths.txt > ${OUTDIR}/ftpfilepaths.txt
 		number_of_complete_genomes="`wc -l < ${OUTDIR}/ftpfilepaths.txt`"
-		echo -e "\n\n--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for genus taxon ID $GENUS_TAXID" >> ${LOGFILE}
+		echo -e "\n\n--> No reference genome for species taxon ID ${SPECIES_TAXID}, expanding the search to genus-level..." >> ${LOGFILE}
+		echo -e "--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for genus taxon ID $GENUS_TAXID" >> ${LOGFILE}
 	fi
 else
 	awk -F '\t' -v genus=${top_genus_pe_hit} '$8 ~ genus' ${OUTDIR}/assembly_summary.txt | awk -F '\t' '$12=="Complete Genome" && $11=="latest" {print $20}' > ${OUTDIR}/ftpdirpaths.txt
 	awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print ftpdir,file}' ${OUTDIR}/ftpdirpaths.txt > ${OUTDIR}/ftpfilepaths.txt
 	number_of_complete_genomes="`wc -l < ${OUTDIR}/ftpfilepaths.txt`"
-	echo -e "\n\n--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for genus taxon ID $GENUS_TAXID" >> ${LOGFILE}
+	echo -e "\n\n--> Kaiju PE top-hit < 50% reads AND second-hit from different genus: expanding the search to genus-level..." >> ${LOGFILE}
+	echo -e "--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for genus taxon ID $GENUS_TAXID" >> ${LOGFILE}
 fi
 
 ## Exit pipeline if no reference genomes
