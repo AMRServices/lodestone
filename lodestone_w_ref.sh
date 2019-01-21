@@ -12,7 +12,7 @@ This script is the SP3 pipeline implementation
 as shared by Stephen Bush
 
 Author: Hardik Parikh
-Last Modified: 01/20/2019
+Last Modified: 01/21/2019
 Version: 0.2
 
 OPTIONS:
