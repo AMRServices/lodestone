@@ -12,8 +12,8 @@ This script is the SP3 pipeline implementation
 as shared by Stephen Bush
 
 Author: Hardik Parikh
-Last Modified: 01/20/2019
-Version: 0.2
+Last Modified: 11/02/2018
+Version: 0.1
 
 OPTIONS:
         -h      Show this message
@@ -161,6 +161,20 @@ else
 	echo -e "\n-->$current_date_time. candidate species for ${CAVID} as predicted from PE and SE reads MATCH!\n" >> ${LOGFILE}
 fi
 
+## Pick the taxonomic level to download references for 
+## If top species has <50% reads classified, AND second hit is from same genus - 
+## then move to genus-level 
+tax_level_to_dwl="species"
+top_sp_pe_hit=$(awk -F '\t' 'NR==3 {print $3}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.pe.txt)
+top_sp_reads=$(awk -F '\t' 'NR==3 {print $1}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.pe.txt)
+top_hit_genus=`echo $top_sp_se_hit | awk '{print $1}'`
+sec_sp_pe_hit=$(awk -F '\t' 'NR==4 {print $3}' ${OUTDIR}/logs/5_kaiju_report/${CAVID}.kaiju_species.pe.txt)
+sec_hit_genus=`echo $sec_sp_pe_hit | awk '{print $1}'`
+if ([[ "$top_hit_genus" == "$sec_hit_genus" ]] && [[ "$top_sp_reads" < 50.0 ]]); then
+	tax_level_to_dwl="genus"
+fi
+
+
 ## Get TaxID for top hit
 SPECIES_TAXID=$(esearch -db taxonomy -query "$top_sp_pe_hit" | efetch -format docsum | xtract -pattern DocumentSummary -element TaxId)
 GENUS_TAXID=$(esearch -db taxonomy -query "$top_genus_pe_hit" | efetch -format docsum | xtract -pattern DocumentSummary -element TaxId)
@@ -168,16 +182,33 @@ GENUS_TAXID=$(esearch -db taxonomy -query "$top_genus_pe_hit" | efetch -format d
 ## Download genomes
 wget ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/assembly_summary.txt &>> ${LOGFILE}
 date_last_modified="`date -r assembly_summary.txt`"
-echo "--> downloaded ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/assembly_summary.txt. last modified $date_last_modified" >> ${LOGFILE}
+echo -e "\n\n--> downloaded ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/assembly_summary.txt. last modified $date_last_modified" >> ${LOGFILE}
 
-awk -v sptaxid=${SPECIES_TAXID} -F "\t" '$7==sptaxid && $12=="Complete Genome" && $11=="latest"{print $20}' ${OUTDIR}/assembly_summary.txt > ${OUTDIR}/ftpdirpaths.txt
-if [[ "$number_of_complete_genomes" == 0 ]]; then
+if [[ "$tax_level_to_dwl" == "species" ]]; then
+	awk -v sptaxid=${SPECIES_TAXID} -F "\t" '$7==sptaxid && $12=="Complete Genome" && $11=="latest"{print $20}' ${OUTDIR}/assembly_summary.txt > ${OUTDIR}/ftpdirpaths.txt
+	awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print ftpdir,file}' ${OUTDIR}/ftpdirpaths.txt > ${OUTDIR}/ftpfilepaths.txt
+	number_of_complete_genomes="`wc -l < ${OUTDIR}/ftpfilepaths.txt`"
+	echo -e "\n\n--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for species taxon ID $SPECIES_TAXID" >> ${LOGFILE}
+	if [[ "$number_of_complete_genomes" == 0 ]]; then
+		awk -F '\t' -v genus=${top_genus_pe_hit} '$8 ~ genus' ${OUTDIR}/assembly_summary.txt | awk -F '\t' '$12=="Complete Genome" && $11=="latest" {print $20}' > ${OUTDIR}/ftpdirpaths.txt
+		awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print ftpdir,file}' ${OUTDIR}/ftpdirpaths.txt > ${OUTDIR}/ftpfilepaths.txt
+		number_of_complete_genomes="`wc -l < ${OUTDIR}/ftpfilepaths.txt`"
+		echo -e "\n\n--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for genus taxon ID $GENUS_TAXID" >> ${LOGFILE}
+	fi
+else
 	awk -F '\t' -v genus=${top_genus_pe_hit} '$8 ~ genus' ${OUTDIR}/assembly_summary.txt | awk -F '\t' '$12=="Complete Genome" && $11=="latest" {print $20}' > ${OUTDIR}/ftpdirpaths.txt
+	awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print ftpdir,file}' ${OUTDIR}/ftpdirpaths.txt > ${OUTDIR}/ftpfilepaths.txt
+	number_of_complete_genomes="`wc -l < ${OUTDIR}/ftpfilepaths.txt`"
+	echo -e "\n\n--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for genus taxon ID $GENUS_TAXID" >> ${LOGFILE}
 fi
 
-awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print ftpdir,file}' ${OUTDIR}/ftpdirpaths.txt > ${OUTDIR}/ftpfilepaths.txt
-number_of_complete_genomes="`wc -l < ${OUTDIR}/ftpfilepaths.txt`"
-echo "--> assembly_summary.txt parsed to identify $number_of_complete_genomes complete genomes for species taxon ID $SPECIESTAXID" >> ${LOGFILE}
+## Exit pipeline if no reference genomes
+if [[ "$number_of_complete_genomes" == 0 ]]; then
+	current_date_time="`date "+%Y-%m-%d %H:%M:%S"`"
+	echo -e "\n\n-->$current_date_time. No Reference Genomes Downloaded for ${CAVID}. Unable to proceed!\n"
+	exit 1
+fi
+
 echo "NUMBER OF COMPLETE GENOMES OBTAINED AFTER PARSING ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/assembly_summary.txt (DOWNLOADED $date_last_modified): $number_of_complete_genomes" >> ${OUTDIR}/logs/6_ref_genomes_downloaded/${CAVID}.reference_genome_download_log.txt
 echo "GENOME URLS:" >> ${OUTDIR}/logs/6_ref_genomes_downloaded/${CAVID}.reference_genome_download_log.txt
 cat ${OUTDIR}/ftpfilepaths.txt >> ${OUTDIR}/logs/6_ref_genomes_downloaded/${CAVID}.reference_genome_download_log.txt

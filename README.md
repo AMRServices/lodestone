@@ -78,7 +78,7 @@ OPTIONS:
 
 ### SLURM submission scripts
 
-Example SLURM job submission scripts are included  
+Example SLURM job submission scripts are included
 	- `submit-lodestone.slurm.sh` : job submission for single isolate data
 	- `submit-lodestone.slurm-array.sh`	: batch submission for multiple isolates using slurm array
 
