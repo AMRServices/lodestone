@@ -67,6 +67,7 @@ mkdir -p ${OUTDIR}
 cd ${OUTDIR}
 touch ${LOGFILE}
 
+SECONDS=0
 current_date_time="`date "+%Y-%m-%d %H:%M:%S"`"
 echo -e "\n\n-->$current_date_time. beginning analysis of ${CAVID}\n" >> ${LOGFILE}
 cp ${IN_R1FILE} ${R1FILE}
@@ -214,4 +215,6 @@ md5sum ${OUTDIR}/${CAVID}.vcf.gz.tbi > ${OUTDIR}/${CAVID}.vcf.gz.tbi.md5sum
 ############
 current_date_time="`date "+%Y-%m-%d %H:%M:%S"`"
 echo -e "\n\n-->$current_date_time. Finished processing ${CAVID}!\n" >> ${LOGFILE}
+duration=$SECONDS
+echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 exit 0

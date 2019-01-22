@@ -65,6 +65,7 @@ mkdir -p ${OUTDIR}
 cd ${OUTDIR}
 touch ${LOGFILE}
 
+SECONDS=0
 current_date_time="`date "+%Y-%m-%d %H:%M:%S"`"
 echo -e "\n\n-->$current_date_time. beginning analysis of ${CAVID}\n" >> ${LOGFILE}
 cp ${IN_R1FILE} ${R1FILE}
@@ -231,7 +232,7 @@ rm ${OUTDIR}/${CAVID}.concatenated_reads.fq.gz
 mash dist -p 20 ${OUTDIR}/${CAVID}.fq.msh ${OUTDIR}/${CAVID}.fa.msh > ${OUTDIR}/logs/7_mash_report/${CAVID}.mash-dist_output.tsv
 closest_mash_hit=$(basename $(sort -g -k3 ${OUTDIR}/logs/7_mash_report/${CAVID}.mash-dist_output.tsv | head -1 | cut -f2))
 closest_mash_hit_root=${closest_mash_hit%_genomic.fna.gz}
-path_to_closest_mash_hit=$(grep $closest_mash_hit_root ${OUTDIR}/assembly_summary.txt | head -1 | awk '{print $20}')
+path_to_closest_mash_hit=$(grep $closest_mash_hit_root ${OUTDIR}/assembly_summary.txt | head -1 | awk -F '\t' '{print $20}')
 FTPPATHG=$path_to_closest_mash_hit/$closest_mash_hit_root'_genomic.fna.gz'
 FTPPATHGFF=$path_to_closest_mash_hit/$closest_mash_hit_root'_genomic.gff.gz'
 wget $FTPPATHG -O ${OUTDIR}/ref.fa.gz &>> ${LOGFILE}
@@ -331,4 +332,6 @@ md5sum ${OUTDIR}/${CAVID}.vcf.gz.tbi > ${OUTDIR}/${CAVID}.vcf.gz.tbi.md5sum
 ############
 current_date_time="`date "+%Y-%m-%d %H:%M:%S"`"
 echo -e "\n\n-->$current_date_time. Finished processing ${CAVID}!\n" >> ${LOGFILE}
+duration=$SECONDS
+echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 exit 0
