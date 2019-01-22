@@ -193,7 +193,7 @@ current_date_time="`date "+%Y-%m-%d %H:%M:%S"`"
 echo -e "\n\n-->$current_date_time. SPAdes de-novo assembly for ${CAVID}...\n" >> ${LOGFILE}
 mkdir -p ${OUTDIR}/logs/9_assembly_statistics
 spades.py --cov-cutoff auto --careful -1 ${R1FILE} -2 ${R2FILE} -s ${OUTDIR}/${CAVID}.se.fq.gz -t 20 -o ${OUTDIR}/spades &>> ${LOGFILE}
-mv ${OUTDIR}/spades/contigs.fasta ${OUTDIR}/${CAVID}.fa
+cp ${OUTDIR}/spades/contigs.fasta ${OUTDIR}/${CAVID}.fa
 ### check this ###
 quast.py -t ${THREADS} --pe1 ${R1FILE} --pe2 ${R2FILE} --single ${OUTDIR}/${CAVID}.se.fq.gz -o ${OUTDIR}/logs/9_assembly_statistics/quast_out ${OUTDIR}/${CAVID}.fa &>> ${LOGFILE}
 
