@@ -45,11 +45,11 @@ done
 #DEMUX_DIR="/project/amr_services/demux"
 DEMUX_DIR="/scratch/hp7d/MathersLab/amr_lodestone_0120/demux"
 mkdir -p ${L_OUTDIR}/logs/10_fastqstats
-zcat ${DEMUX_DIR}/${RUNID}/${CAVID}*_R1_*.fastq.gz | fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_raw_R1.fastqstats.txt
-zcat ${DEMUX_DIR}/${RUNID}/${CAVID}*_R2_*.fastq.gz | fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_raw_R2.fastqstats.txt
-zcat ${L_OUTDIR}/${CAVID}_R1.fq.gz | fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_hq_R1.fastqstats.txt
-zcat ${L_OUTDIR}/${CAVID}_R2.fq.gz | fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_hq_R2.fastqstats.txt
-zcat ${L_OUTDIR}/${CAVID}.se.fq.gz | fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_hq_se.fastqstats.txt
+zcat ${DEMUX_DIR}/${RUNID}/${CAVID}*_R1_*.fastq.gz | /project/amr_services/scripts/fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_raw_R1.fastqstats.txt
+zcat ${DEMUX_DIR}/${RUNID}/${CAVID}*_R2_*.fastq.gz | /project/amr_services/scripts/fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_raw_R2.fastqstats.txt
+zcat ${L_OUTDIR}/${CAVID}_R1.fq.gz | /project/amr_services/scripts/fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_hq_R1.fastqstats.txt
+zcat ${L_OUTDIR}/${CAVID}_R2.fq.gz | /project/amr_services/scripts/fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_hq_R2.fastqstats.txt
+zcat ${L_OUTDIR}/${CAVID}.se.fq.gz | /project/amr_services/scripts/fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_hq_se.fastqstats.txt
 
 # collect read counts
 rawreads_for=`cat ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_raw_R1.fastqstats.txt | grep "Number of reads" | awk '{print $NF}'`
