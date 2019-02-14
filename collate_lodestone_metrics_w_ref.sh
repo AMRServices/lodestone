@@ -43,8 +43,8 @@ done
 
 ### run fastqstats on raw r1/r2
 ### run fastqstats on hq r1/r2/se
-#DEMUX_DIR="/project/amr_services/demux"
-DEMUX_DIR="/scratch/hp7d/MathersLab/amr_lodestone_0120/demux"
+DEMUX_DIR="/project/amr_services/demux"
+#DEMUX_DIR="/scratch/hp7d/MathersLab/amr_lodestone_0120/demux"
 mkdir -p ${L_OUTDIR}/logs/10_fastqstats
 zcat ${DEMUX_DIR}/${RUNID}/${CAVID}*_R1_*.fastq.gz | /project/amr_services/scripts/fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_raw_R1.fastqstats.txt
 zcat ${DEMUX_DIR}/${RUNID}/${CAVID}*_R2_*.fastq.gz | /project/amr_services/scripts/fastqstats > ${L_OUTDIR}/logs/10_fastqstats/${CAVID}_raw_R2.fastqstats.txt
