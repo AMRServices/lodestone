@@ -239,7 +239,7 @@ gunzip ${OUTDIR}/ref.fa.gz
 wget $FTPPATHGFF -O ${OUTDIR}/ref.gff.gz &>> ${LOGFILE}
 gunzip ${OUTDIR}/ref.gff.gz
 echo "URL FOR CLOSEST MASH HIT: $FTPPATHG" >> ${OUTDIR}/logs/7_mash_report/${CAVID}.reference_genome_download_log.txt
-rm ${OUTDIR}/assembly_summary.txt
+mv ${OUTDIR}/assembly_summary.txt ${OUTDIR}/logs/6_ref_genomes_downloaded/
 rm ${OUTDIR}/fa_filepaths_for_mash_sketch.txt
 rm ${OUTDIR}/${CAVID}.fq.msh ${OUTDIR}/${CAVID}.fa.msh
 rm -rf ${OUTDIR}/temp_dir_genome_storage

@@ -90,7 +90,7 @@ num_genomes=`grep "taxon ID" ${L_OUTDIR}/log.${CAVID}.txt | awk '{print $6}'`
 
 # mash results
 mash_closest_ref_acc=`grep "NCBI_Assembly" ${L_OUTDIR}/ref.gff | awk -F ':' '{print $2}'`
-mash_closest_ref_str=`grep ${mash_closest_ref_acc} assembly_summary.txt | awk -F '\t' '{print $8,$9}'`
+mash_closest_ref_str=`grep ${mash_closest_ref_acc} ${L_OUTDIR}/logs/6_ref_genomes_downloaded/assembly_summary.txt | awk -F '\t' '{print $8,$9}'`
 
 # chrom seq id
 chrom=`head -1 ${L_OUTDIR}/ref.fa.fai | awk -F '\t' '{print $1}'`
@@ -130,7 +130,7 @@ proctime=`echo $(( $(date '+%s' --date="${etime}") - $(date '+%s' --date="${stim
 # print output
 OUTFILE=${L_OUTDIR}/${CAVID}_lodestone_summary.tsv
 touch ${OUTFILE}
-RUNID=`dirname ${L_OUTDIR} | awk -F '/' '{print $NF}'`
+#RUNID=`dirname ${L_OUTDIR} | awk -F '/' '{print $NF}'`
 
 echo -e "RunID\tSampleID\tRawReads\tHQReads\tRawReadLen(Avg)\tHQReadLen(Avg)\tRawReadQual(Avg)\tHQReadQual(Avg)\tKaiju_PE_TopHit\tKaiju_PE_SecHit\tCandidateTaxon\tCandidateTaxon_NCBITaxID\tNumGenomeDwl\tMASH_ClosestRef\tMASH_ClosestRef_AccID\tBWA_ReadsMapped(%)\tGenomeCoverage(%)\tDepthofCoverage(X)\tSNPs\tHQ_SNPs(QUAL>=30, DP>=20)\tNumContigs\tNumContigs(>=1kb)\tTotalLength\tGC(%)\tN50\tLodestoneError\tLodestone_TotalProcTime(min:sec)" > ${OUTFILE}
 
