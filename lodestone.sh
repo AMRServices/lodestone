@@ -314,6 +314,15 @@ cp ${OUTDIR}/spades/contigs.fasta ${OUTDIR}/${CAVID}.fa
 quast.py -t ${THREADS} --pe1 ${R1FILE} --pe2 ${R2FILE} --single ${OUTDIR}/${CAVID}.se.fq.gz -o ${OUTDIR}/logs/9_assembly_statistics/quast_out ${OUTDIR}/${CAVID}.fa &>> ${LOGFILE}
 
 
+######################
+### MultiQC Report ###
+######################
+current_date_time="`date "+%Y-%m-%d %H:%M:%S"`"
+echo -e "\n\n-->$current_date_time. Generating MultiQC report for ${CAVID}...\n" >> ${LOGFILE}
+cd ${OUTDIR}
+multiqc ${OUTDIR}
+
+
 ############
 ### Clean up
 ############
