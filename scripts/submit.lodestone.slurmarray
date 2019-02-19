@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --job-name=lodestone			# Job name
+#SBATCH --cpus-per-task=20			# Number of CPU cores per task
+#SBATCH --mem=80gb					# Job Memory
+#SBATCH --time=12:00:00				# Time limit hrs:min:sec
+#SBATCH --output=lodestone_%A-%a.out	# Standard output log
+#SBATCH --error=lodestone_%A-%a.err	# Standard error log
+#SBATCH --array=1-20%20			# Array range
+#SBATCH -A amr_services				# allocation groups
+#SBATCH -p standard					# slurm queue
+pwd; hostname; date
+
+echo This is task $SLURM_ARRAY_TASK_ID
+
+### load modules
+module purge
+module use /project/som_infc_dis_mathers/modulefiles
+module load lodestone
+
+SEEDFILE=$1
+cmd=$(awk -v line=$SLURM_ARRAY_TASK_ID '{if (NR==line) print $0}' $SEEDFILE)
+
+echo $cmd
+eval $cmd
+
+date
