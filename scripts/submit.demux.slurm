@@ -18,7 +18,7 @@ module load multiqc
 
 ### command
  
-sh  demuxMiSeq.sh 
+sh  demuxMiSeq.sh \
 	-i /project/amr_services/miseq/181105_M70720_0007_000000000-C574B \
 	-o /scratch/mst3k/amr_services/demux/ \
 	-t 20
